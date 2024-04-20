@@ -2,35 +2,37 @@
 
 #include <image_processing/pixelformat.hpp>
 #include <image_processing/pixelformat_traits.hpp>
+#include <image_processing/size.hpp>
 
 namespace image_processing::types
 {
 
 template <Pixelformat p> class Image
 {
-
   public:
     using Data = DataType_of_t<p> *;
     using cData = const DataType_of_t<p> *;
 
     Image() = default;
-    Image(size_t width, size_t height) : m_width{width}, m_height{height}
+    explicit Image(Size size) : m_size{size}
     {
-        if (width != 0 && height != 0)
+        if (size.area().value != 0)
         {
-            m_data = std::make_unique<DataType_of_t<p>[]>(
-                width * height * PixelformatInfo<p>::BytesPerPixel);
+            const auto area = m_size.area();
+            m_data = std::make_unique<DataType_of_t<p>[]>(area.value);
         }
     }
 
-    [[nodiscard]] size_t width() const { return m_width; }
-    [[nodiscard]] size_t height() const { return m_height; }
-    [[nodiscard]] bool empty() const { return m_height == 0 || m_width == 0; }
+    [[nodiscard]] Size size() const { return m_size; }
+    [[nodiscard]] bool empty() const { return m_size.area() == 0; }
+
     Data data() const { return m_data.get(); }
 
+    Data begin() const { return data(); }
+    Data end() const { return data() + m_size.area().value; }
+
   private:
-    size_t m_width{};
-    size_t m_height{};
+    Size m_size{};
     std::unique_ptr<DataType_of_t<p>[]> m_data{};
 };
 } // namespace image_processing::types
