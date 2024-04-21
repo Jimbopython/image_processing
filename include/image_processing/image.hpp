@@ -1,5 +1,6 @@
 #pragma once
 
+#include <image_processing/detail/buffer.hpp>
 #include <image_processing/pixelformat.hpp>
 #include <image_processing/pixelformat_traits.hpp>
 #include <image_processing/size.hpp>
@@ -14,25 +15,32 @@ template <Pixelformat p> class Image
     using cData = const DataType_of_t<p> *;
 
     Image() = default;
-    explicit Image(Size size) : m_size{size}
+    explicit Image(Size size)
+        : m_size{size}, m_buffer(detail::createBuffer<p>(size.area()))
     {
-        if (size.area().value != 0)
-        {
-            const auto area = m_size.area();
-            m_data = std::make_unique<DataType_of_t<p>[]>(area.value);
-        }
+    }
+    Image(Size size, Data data)
+        : m_size{size}, m_buffer{detail::createBuffer<p>(data)}
+    {
     }
 
     [[nodiscard]] Size size() const { return m_size; }
     [[nodiscard]] bool empty() const { return m_size.area() == 0; }
 
-    Data data() const { return m_data.get(); }
+    Data data() const
+    {
+        if (!m_buffer)
+        {
+            return nullptr;
+        }
+        return m_buffer->data();
+    }
 
     Data begin() const { return data(); }
     Data end() const { return data() + m_size.area().value; }
 
   private:
     Size m_size{};
-    std::unique_ptr<DataType_of_t<p>[]> m_data{};
+    std::unique_ptr<detail::IBuffer> m_buffer{};
 };
 } // namespace image_processing::types

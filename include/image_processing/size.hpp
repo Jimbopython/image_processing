@@ -16,6 +16,7 @@ struct Area
     {
         return !(lhs == otherValue);
     }
+    size_t operator*(size_t otherValue) const { return value * otherValue; }
 };
 
 struct Size

@@ -42,4 +42,12 @@ TEST_CASE("An image ", "[image]")
         begin++;
         REQUIRE(begin == img.end());
     }
+
+    SECTION("can be created from a buffer")
+    {
+        constexpr auto pixelFormat = Pixelformat::Mono8;
+        std::array<DataType_of_t<pixelFormat>, 1> buffer{42};
+        const Image<pixelFormat> img{{1, 1}, buffer.data()};
+        REQUIRE(img.data() == buffer.data());
+    }
 }
