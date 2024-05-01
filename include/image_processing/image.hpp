@@ -43,4 +43,24 @@ template <Pixelformat p> class Image
     Size m_size{};
     std::unique_ptr<detail::IBuffer> m_buffer{};
 };
+
+template <Pixelformat p, Size s_,
+          std::array<DataType_of_t<p>, s_.area().value> d_>
+class ConstexprImage
+{
+  public:
+    using Data = DataType_of_t<p> *;
+    using cData = const DataType_of_t<p> *;
+
+    consteval ConstexprImage() = default;
+
+    [[nodiscard]] consteval Size size() const { return size; }
+    [[nodiscard]] consteval bool empty() const { return s_.area() == 0; }
+
+    consteval cData data() const { return d_.data(); }
+
+    consteval Data begin() const { return data(); }
+    consteval Data end() const { return data() + s_.area().value; }
+};
+
 } // namespace image_processing::types

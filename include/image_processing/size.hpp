@@ -24,6 +24,6 @@ struct Size
     size_t width;
     size_t height;
 
-    [[nodiscard]] Area area() const { return Area{width * height}; }
+    [[nodiscard]] constexpr Area area() const { return Area{width * height}; }
 };
 } // namespace image_processing::types

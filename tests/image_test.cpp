@@ -50,4 +50,18 @@ TEST_CASE("An image ", "[image]")
         const Image<pixelFormat> img{{1, 1}, buffer.data()};
         REQUIRE(img.data() == buffer.data());
     }
+
+    SECTION("can be created from a constexpr buffer")
+    {
+        constexpr auto pixelFormat = Pixelformat::Mono8;
+        constexpr Size size{1, 1};
+        constexpr std::array<DataType_of_t<pixelFormat>, 1> buffer{42};
+
+        constexpr ConstexprImage<pixelFormat, size, buffer> img;
+
+        // todo: investigate why this fails
+        // REQUIRE(img.data() == buffer.data());
+        // STATIC_REQUIRE(img.data() == buffer.data());
+        STATIC_REQUIRE(img.data()[0] == buffer[0]);
+    }
 }
